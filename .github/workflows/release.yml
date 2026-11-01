@@ -1,12 +1,14 @@
-# Every push to master that touches a theme or a preview publishes a GitHub Release tagged with the
-# UTC date and time (v2026.11.03-1930). The release holds every theme as <id>.zip, its preview as
-# <id>.gif, and one registry.json (id, name, author, version, zip, sha256, preview). To ship an
-# update to a theme, bump `version` in its theme.json. The website repo pulls the latest release.
+# Every push to master that touches a theme publishes a GitHub Release tagged with the UTC date and
+# time (v2026.11.03-1930). The release holds only <id>.zip per theme and one registry.json (id, name,
+# author, version, zip, sha256, preview). Previews are not assets: `preview` is a raw link to
+# previews/<id>.gif in this repo. A theme is rebuilt only when its version in index.json differs from the previous release's; the others are
+# copied over from it. To ship an update, bump the version (see CLAUDE.md). The website repo pulls
+# the latest release.
 name: release
 on:
   push:
     branches: [master]
-    paths: ["themes/**", "previews/**", "scripts/**", ".github/workflows/release.yml"]
+    paths: ["themes/**", "index.json", "scripts/**", ".github/workflows/release.yml"]
   workflow_dispatch:
 permissions:
   contents: write
@@ -19,10 +21,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build theme zips and registry
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           tag="v$(date -u +%Y.%m.%d-%H%M)"
           echo "TAG=$tag" >> "$GITHUB_ENV"
-          node scripts/build-registry.mjs "$tag"
+          # Themes whose version is unchanged are copied over from the previous release.
+          mkdir prev
+          prevtag=$(gh release list --limit 1 --json tagName -q '.[0].tagName')
+          if [ -n "$prevtag" ]; then gh release download "$prevtag" -D prev || true; fi
+          node scripts/build-registry.mjs "$tag" prev
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}

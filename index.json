@@ -1,0 +1,17 @@
+{
+  "clean-circle": {
+    "version": "1.0.0"
+  },
+  "kando-default": {
+    "version": "1.0.0"
+  },
+  "neon-lights": {
+    "version": "1.0.0"
+  },
+  "purity": {
+    "version": "1.0.0"
+  },
+  "rainbow-labels": {
+    "version": "1.0.0"
+  }
+}
