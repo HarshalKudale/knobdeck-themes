@@ -1,5 +1,5 @@
 // Builds the release assets into out/: <id>.zip (the theme folder's contents at the zip root) and
-// registry.json describing them all. Previews are not assets: each entry's `preview` is a raw GitHub
+// registry.json describing them all (each entry's `zipUrl` is this release's download link). Previews are not assets: each entry's `preview` is a raw GitHub
 // link to previews/<id>.gif in this repo, so changing a GIF needs no release.
 //   node scripts/build-registry.mjs <release tag> [dir holding the previous release's assets]
 // index.json lists every theme's version (it must equal `version` in the theme's theme.json, default
@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+const REPO = "https://github.com/HarshalKudale/knobdeck-themes";
 const RAW = "https://raw.githubusercontent.com/HarshalKudale/knobdeck-themes/master";
 const [tag, prevDir] = process.argv.slice(2);
 if (!tag) throw new Error("usage: build-registry.mjs <tag> [prev dir]");
@@ -29,10 +30,12 @@ const themes = ids.map((id) => {
   if (index[id]?.version !== version) throw new Error(`${id}: index.json says ${index[id]?.version}, themes/${id}/theme.json says ${version}`);
 
   const preview = existsSync(`previews/${id}.gif`) ? `${RAW}/previews/${id}.gif` : null;
+  const zipUrl = `${REPO}/releases/download/${tag}/${id}.zip`;
   const old = prev.find((t) => t.id === id);
-  if (old?.version === version && existsSync(`${prevDir}/${old.zip}`)) {
-    copyFileSync(`${prevDir}/${old.zip}`, `out/${old.zip}`);
-    return { ...old, preview };
+  if (old?.version === version && existsSync(`${prevDir}/${id}.zip`)) {
+    copyFileSync(`${prevDir}/${id}.zip`, `out/${id}.zip`);
+    const { zip, ...rest } = old; // entries from before zipUrl carried a file name
+    return { ...rest, zipUrl, preview };
   }
   const zip = resolve("out", `${id}.zip`);
   execFileSync("zip", ["-qr", zip, "."], { cwd: `themes/${id}` });
@@ -41,7 +44,7 @@ const themes = ids.map((id) => {
     name: desc.name ?? id,
     author: desc.author ?? "",
     version,
-    zip: `${id}.zip`,
+    zipUrl,
     sha256: createHash("sha256").update(readFileSync(zip)).digest("hex"),
     preview,
   };

@@ -1,6 +1,6 @@
 # Every push to master that touches a theme publishes a GitHub Release tagged with the UTC date and
 # time (v2026.11.03-1930). The release holds only <id>.zip per theme and one registry.json (id, name,
-# author, version, zip, sha256, preview). Previews are not assets: `preview` is a raw link to
+# author, version, zipUrl, sha256, preview). Previews are not assets: `preview` is a raw link to
 # previews/<id>.gif in this repo. A theme is rebuilt only when its version in index.json differs from the previous release's; the others are
 # copied over from it. To ship an update, bump the version (see CLAUDE.md). The website repo pulls
 # the latest release.
