@@ -1,0 +1,29 @@
+# Every push to master that touches a theme or a preview publishes a GitHub Release tagged with the
+# UTC date and time (v2026.11.03-1930). The release holds every theme as <id>.zip, its preview as
+# <id>.gif, and one registry.json (id, name, author, version, zip, sha256, preview). To ship an
+# update to a theme, bump `version` in its theme.json. The website repo pulls the latest release.
+name: release
+on:
+  push:
+    branches: [master]
+    paths: ["themes/**", "previews/**", "scripts/**", ".github/workflows/release.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build theme zips and registry
+        run: |
+          tag="v$(date -u +%Y.%m.%d-%H%M)"
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          node scripts/build-registry.mjs "$tag"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$TAG" out/* --title "$TAG" --notes "Themes: $(jq -r '[.themes[] | "\(.id) \(.version)"] | join(", ")' out/registry.json)"

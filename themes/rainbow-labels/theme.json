@@ -1,0 +1,29 @@
+{
+  "author": "Simon Schneegans",
+  "centerTextWrapWidth": 90,
+  "colors": {
+    "icon-color": "#333",
+    "label-background-color": "#333",
+    "label-color": "#ddd"
+  },
+  "drawCenterText": false,
+  "drawChildrenBelow": false,
+  "engineVersion": 1,
+  "layers": [
+    {
+      "class": "icon-layer",
+      "content": "icon"
+    },
+    {
+      "class": "label-layer",
+      "content": "name"
+    }
+  ],
+  "license": "CC0-1.0",
+  "maxMenuRadius": 160,
+  "name": "Rainbow Labels",
+  "themeVersion": "1.0",
+  "presets": [
+    "Bright Prism"
+  ]
+}

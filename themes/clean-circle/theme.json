@@ -1,0 +1,34 @@
+{
+  "author": "Simon Schneegans",
+  "centerTextWrapWidth": 95,
+  "colors": {
+    "action-icon-color": "rgba(255, 200, 225, 1)",
+    "background-color": "#fff",
+    "submenu-icon-color": "#333",
+    "text-color": "#222"
+  },
+  "drawChildrenBelow": true,
+  "engineVersion": 1,
+  "layers": [
+    {
+      "class": "arrow-layer",
+      "content": "none"
+    },
+    {
+      "class": "icon-layer",
+      "content": "icon"
+    },
+    {
+      "class": "quick-key",
+      "content": "quick-select-key"
+    }
+  ],
+  "license": "CC0-1.0",
+  "maxMenuRadius": 160,
+  "name": "Clean Circle",
+  "themeVersion": "1.0",
+  "presets": [
+    "Cotton Candy",
+    "Dark and Cozy"
+  ]
+}

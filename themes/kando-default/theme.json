@@ -1,0 +1,33 @@
+{
+  "author": "Simon Schneegans",
+  "centerTextWrapWidth": 95,
+  "colors": {
+    "background-color": "rgb(255, 255, 255)",
+    "border-color": "rgb(109, 109, 109)",
+    "hover-color": "rgb(255, 200, 200)",
+    "text-color": "rgb(60, 60, 60)",
+    "wedge-color": "rgba(0, 0, 0, 0.2)",
+    "wedge-highlight-color": "rgba(0, 0, 0, 0.1)"
+  },
+  "drawChildrenBelow": true,
+  "drawSelectionWedges": true,
+  "engineVersion": 1,
+  "layers": [
+    {
+      "class": "quick-key",
+      "content": "quick-select-key"
+    },
+    {
+      "class": "icon-layer",
+      "content": "icon"
+    }
+  ],
+  "license": "CC0-1.0",
+  "maxMenuRadius": 160,
+  "name": "Kando Default",
+  "themeVersion": "1.0",
+  "presets": [
+    "Blue Glass",
+    "Dark Night"
+  ]
+}
