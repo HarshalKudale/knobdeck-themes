@@ -1,0 +1,30 @@
+{
+  "name": "Mono Line",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Thin outlines and icons, nothing else. Pick Ink for light wallpapers.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(135deg, #4b6cb7, #182848)",
+  "presets": [
+    "Gold",
+    "Ink"
+  ],
+  "colors": {
+    "line-color": "#ffffff",
+    "shade-color": "rgba(0, 0, 0, 0.18)",
+    "drop-color": "rgba(0, 0, 0, 0.45)"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "colors": {
+    "accent-color": "#e6f2ff",
+    "surface-color": "rgba(6, 8, 12, 0.9)",
+    "wedge-highlight-color": "rgba(230, 242, 255, 0.08)"
+  }
+}

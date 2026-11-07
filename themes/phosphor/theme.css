@@ -1,0 +1,205 @@
+/* Phosphor: A green-screen terminal: square tiles, scanlines and glowing monospace labels.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+.menu-node {
+  --child-distance: 112px;
+  --grandchild-distance: 20px;
+  --center-size: 92px;
+  --child-size: 48px;
+  --child-size-base: 48px;
+  --grandchild-size: 5px;
+  --connector-width: 2px;
+  --sibling-spacing: 10px;
+  --menu-transition: all 200ms steps(6, end);
+
+  .face {
+    border-radius: 3px;
+    color: var(--accent-color);
+    background:
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.28) 0 1px, transparent 1px 3px),
+      var(--surface-color);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 60%, transparent),
+      0 0 12px color-mix(in srgb, var(--accent-color) 18%, transparent);
+  }
+
+  .face svg {
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent-color) 70%, transparent));
+  }
+
+  /* Corner brackets on the center. */
+  &.active > .face {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 35%, transparent),
+      0 0 18px color-mix(in srgb, var(--accent-color) 18%, transparent);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      background:
+        linear-gradient(var(--accent-color), var(--accent-color)) 0 0 / 12px 2px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 0 0 / 2px 12px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 100% 0 / 12px 2px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 100% 0 / 2px 12px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 0 100% / 12px 2px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 0 100% / 2px 12px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 100% 100% / 12px 2px,
+        linear-gradient(var(--accent-color), var(--accent-color)) 100% 100% / 2px 12px;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+  }
+
+  /* Hovered: inverted video. */
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: #000;
+    background: var(--accent-color);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent-color) 60%, transparent);
+
+    & svg {
+      filter: none;
+    }
+  }
+
+  &.grandchild > .face {
+    border-radius: 0;
+    background: var(--accent-color);
+    box-shadow: none;
+  }
+
+  .connector {
+    background: repeating-linear-gradient(90deg, var(--accent-color) 0 4px, transparent 4px 8px);
+    opacity: 0.6;
+  }
+
+  &.active > .connector {
+    opacity: 1;
+  }
+}
+
+.center-text {
+  color: var(--accent-color);
+  font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent-color) 70%, transparent);
+
+  p::before {
+    content: "> ";
+  }
+}

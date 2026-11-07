@@ -1,0 +1,259 @@
+/* Analog: A hardware synth knob: knurled metal, tick marks and an LED arc that follows your pointer.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+.menu-node {
+  --child-distance: 118px;
+  --grandchild-distance: 20px;
+  --center-size: 94px;
+  --child-size: 46px;
+  --child-size-base: 46px;
+  --grandchild-size: 6px;
+  --connector-width: 4px;
+  --ticks-size: 132px;
+  --ease: cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  --menu-transition: all 260ms var(--ease);
+
+  .face {
+    color: var(--icon-color);
+  }
+
+  /* The knob: knurled edge over a domed cap. */
+  &.active > .face {
+    border-radius: 50%;
+    background:
+      repeating-conic-gradient(rgba(255, 255, 255, 0.05) 0deg 2deg, transparent 2deg 6deg),
+      radial-gradient(circle at 50% 30%, #50535b, #23252a 62%, #18191c);
+    box-shadow:
+      0 0 0 3px #0c0d0f,
+      0 0 0 4px rgba(255, 255, 255, 0.07),
+      inset 0 1px 1px rgba(255, 255, 255, 0.18),
+      0 12px 28px rgba(0, 0, 0, 0.6);
+  }
+
+  /* The pointer line on the knob turns with the pointer. */
+  .notch {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &.active > .notch {
+    display: block;
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+    rotate: var(--pointer-angle);
+    transition: --pointer-angle 90ms linear;
+    background: linear-gradient(var(--accent-color), var(--accent-color)) 50% 7px / 3px 16px no-repeat;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 4px var(--accent-color));
+  }
+
+  &.active:has(> .hovered) > .notch {
+    background-size: 3px 10px;
+  }
+
+  /* Scale ticks around the knob, and the lit ones near the hovered item. */
+  .ticks,
+  .leds {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  &.active > .ticks,
+  &.active:has(> .hovered) > .leds {
+    display: block;
+    top: calc(var(--ticks-size) / -2);
+    left: calc(var(--ticks-size) / -2);
+    width: var(--ticks-size);
+    height: var(--ticks-size);
+  }
+
+  &.active > .ticks {
+    background: repeating-conic-gradient(var(--tick-color) 0deg 1.6deg, transparent 1.6deg 10deg);
+    mask: radial-gradient(closest-side, transparent calc(100% - 9px), #000 calc(100% - 9px), #000 calc(100% - 2px), transparent calc(100% - 2px));
+  }
+
+  &.active:has(> .hovered) > .leds {
+    background: repeating-conic-gradient(var(--accent-color) 0deg 1.6deg, transparent 1.6deg 10deg);
+    mask:
+      radial-gradient(closest-side, transparent calc(100% - 9px), #000 calc(100% - 9px), #000 calc(100% - 2px), transparent calc(100% - 2px)),
+      conic-gradient(from calc(var(--hover-angle) - 26deg), #000 0deg 52deg, transparent 52deg);
+    mask-composite: intersect;
+    filter: drop-shadow(0 0 3px var(--accent-color));
+    transition: --hover-angle 140ms var(--ease);
+  }
+
+  /* Children are panel buttons with an LED. */
+  &.parent > .face,
+  &.child > .face {
+    border-radius: 11px;
+    background: linear-gradient(#2c2e33, #1c1d21);
+    box-shadow:
+      0 0 0 1px #0a0a0c,
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 6px 14px rgba(0, 0, 0, 0.5);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--accent-color) 22%, #1a1a1a);
+      transition: background 100ms ease, box-shadow 100ms ease;
+    }
+  }
+
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: #fff;
+    background: linear-gradient(#34363c, #222327);
+
+    &::after {
+      background: var(--accent-color);
+      box-shadow: 0 0 6px 1px var(--accent-color);
+    }
+  }
+
+  &.grandchild > .face {
+    border-radius: 50%;
+    background: #5a5d63;
+  }
+
+  .connector {
+    background: #26282d;
+    box-shadow: 0 0 0 1px #0c0d0f;
+  }
+
+  &.active > .connector {
+    background: var(--accent-color);
+  }
+}
+
+.center-text {
+  color: var(--text-color);
+  font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

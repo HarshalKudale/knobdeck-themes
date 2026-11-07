@@ -1,0 +1,37 @@
+{
+  "name": "Studio",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "A creator's console: dark rounded keys and an on-air light. Made for streaming setups.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(160deg, #202027, #09090b)",
+  "presets": [
+    "Gold",
+    "Teal",
+    "Violet"
+  ],
+  "colors": {
+    "accent-color": "#ff3b3b",
+    "key-color": "#17171b",
+    "edge-color": "#2b2b32",
+    "icon-color": "#d9d9e0",
+    "text-color": "#ffffff"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    },
+    {
+      "class": "on-air",
+      "content": "none"
+    }
+  ]
+}

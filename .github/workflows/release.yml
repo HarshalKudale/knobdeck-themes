@@ -8,7 +8,7 @@ name: release
 on:
   push:
     branches: [master]
-    paths: ["themes/**", "index.json", "scripts/**", ".github/workflows/release.yml"]
+    paths: ["themes/**", "index.json", "scripts/build-registry.mjs", ".github/workflows/release.yml"]
   workflow_dispatch:
 permissions:
   contents: write

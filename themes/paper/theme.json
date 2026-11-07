@@ -1,0 +1,31 @@
+{
+  "name": "Paper",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Ink on paper: hand-drawn outlines, hard shadows and a highlighter for the hovered item.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(135deg, #efe9dc, #d6cebd)",
+  "presets": [
+    "Blueprint",
+    "Chalk",
+    "Kraft"
+  ],
+  "colors": {
+    "paper-color": "#fbf8f1",
+    "ink-color": "#1f1d1a",
+    "accent-color": "#ffe45c"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

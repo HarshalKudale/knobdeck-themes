@@ -1,0 +1,11 @@
+{
+  "colors": {
+    "petal-saturation": "60%",
+    "petal-lightness": "42%",
+    "face-color": "rgba(30, 26, 44, 0.94)",
+    "icon-lightness": "80%",
+    "text-color": "#f4ecff",
+    "center-a": "#2c2640",
+    "center-b": "#1c1828"
+  }
+}

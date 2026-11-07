@@ -1,0 +1,205 @@
+/* Studio: A creator's console: dark rounded keys and an on-air light. Made for streaming setups.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+@keyframes studio-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-color) 70%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+}
+
+.menu-node {
+  --child-distance: 114px;
+  --grandchild-distance: 21px;
+  --center-size: 92px;
+  --child-size: 50px;
+  --child-size-base: 50px;
+  --grandchild-size: 7px;
+  --connector-width: 3px;
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --menu-transition: all 260ms var(--ease);
+
+  .face {
+    border-radius: 30%;
+    color: var(--icon-color);
+    background: linear-gradient(#1d1d22, var(--key-color));
+    box-shadow:
+      inset 0 0 0 1px var(--edge-color),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 8px 20px rgba(0, 0, 0, 0.55);
+  }
+
+  &.active > .face {
+    border-radius: 32%;
+    background: linear-gradient(#18181c, #0e0e11);
+  }
+
+  /* The on-air light sits on top of the center. */
+  .on-air {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &.active > .on-air {
+    display: block;
+    top: calc(var(--center-size) / -2 + 5px);
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    animation: studio-pulse 1.6s ease-out infinite;
+  }
+
+  &.active:has(> .hovered) > .on-air {
+    opacity: 0;
+  }
+
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: #fff;
+    background: linear-gradient(color-mix(in srgb, var(--accent-color) 30%, #1d1d22), color-mix(in srgb, var(--accent-color) 16%, var(--key-color)));
+    box-shadow:
+      inset 0 0 0 1.5px var(--accent-color),
+      0 0 18px color-mix(in srgb, var(--accent-color) 35%, transparent),
+      0 8px 20px rgba(0, 0, 0, 0.55);
+  }
+
+  &.grandchild > .face {
+    border-radius: 2px;
+    background: #4a4a54;
+    box-shadow: none;
+  }
+
+  .connector {
+    background: var(--edge-color);
+  }
+
+  &.active > .connector {
+    background: var(--accent-color);
+  }
+}
+
+.center-text {
+  color: var(--text-color);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

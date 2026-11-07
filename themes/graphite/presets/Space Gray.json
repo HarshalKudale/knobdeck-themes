@@ -1,0 +1,12 @@
+{
+  "colors": {
+    "metal-hi": "#73777e",
+    "metal-lo": "#3a3d42",
+    "metal-edge": "rgba(0, 0, 0, 0.55)",
+    "icon-color": "#eceef0",
+    "engrave-color": "rgba(0, 0, 0, 0.5)",
+    "text-color": "#f2f3f5",
+    "accent-color": "#ff9f0a",
+    "on-accent-color": "#1a1a1a"
+  }
+}

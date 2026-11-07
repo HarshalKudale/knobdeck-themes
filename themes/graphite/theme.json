@@ -1,0 +1,36 @@
+{
+  "name": "Graphite",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Machined aluminium: a spun-metal center, brushed buttons and engraved icons.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(135deg, #95a1b2, #4b5563)",
+  "presets": [
+    "Gold",
+    "Navy",
+    "Space Gray"
+  ],
+  "colors": {
+    "metal-hi": "#f5f6f8",
+    "metal-lo": "#b6bac2",
+    "metal-edge": "rgba(0, 0, 0, 0.28)",
+    "icon-color": "#2a2d32",
+    "engrave-color": "rgba(255, 255, 255, 0.7)",
+    "text-color": "#1e2125",
+    "accent-color": "#2f6fd6",
+    "on-accent-color": "#ffffff"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

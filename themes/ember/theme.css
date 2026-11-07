@@ -1,0 +1,203 @@
+/* Ember: Warm amber on black, with a segmented meter that lights up towards your pointer.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+.menu-node {
+  --child-distance: 116px;
+  --grandchild-distance: 21px;
+  --center-size: 90px;
+  --child-size: 50px;
+  --child-size-base: 50px;
+  --grandchild-size: 6px;
+  --connector-width: 2px;
+  --meter-size: 122px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --menu-transition: all 280ms var(--ease);
+
+  .face {
+    border-radius: 50%;
+    color: color-mix(in srgb, var(--accent-color) 88%, transparent);
+    background: var(--surface-color);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 30%, transparent),
+      0 8px 22px rgba(0, 0, 0, 0.55);
+  }
+
+  &.active > .face {
+    background: radial-gradient(circle at 50% 40%, #1a120c, var(--surface-color) 70%);
+  }
+
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: #1a0d00;
+    background: radial-gradient(circle at 45% 35%, color-mix(in srgb, var(--accent-color) 65%, #fff), var(--accent-color) 70%);
+    box-shadow:
+      0 0 0 1px var(--accent-color),
+      0 0 22px color-mix(in srgb, var(--accent-color) 50%, transparent),
+      0 8px 22px rgba(0, 0, 0, 0.55);
+  }
+
+  &.grandchild > .face {
+    background: color-mix(in srgb, var(--accent-color) 55%, #000);
+    box-shadow: none;
+  }
+
+  /* The meter: 24 segments around the center. */
+  .meter,
+  .lit {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  &.active > .meter,
+  &.active:has(> .hovered) > .lit {
+    display: block;
+    top: calc(var(--meter-size) / -2);
+    left: calc(var(--meter-size) / -2);
+    width: var(--meter-size);
+    height: var(--meter-size);
+  }
+
+  &.active > .meter {
+    background: repeating-conic-gradient(color-mix(in srgb, var(--accent-color) 18%, #1a1208) 0deg 11deg, transparent 11deg 15deg);
+    mask: radial-gradient(closest-side, transparent calc(100% - 8px), #000 calc(100% - 8px));
+  }
+
+  &.active:has(> .hovered) > .lit {
+    background: repeating-conic-gradient(var(--accent-color) 0deg 11deg, transparent 11deg 15deg);
+    mask:
+      radial-gradient(closest-side, transparent calc(100% - 8px), #000 calc(100% - 8px)),
+      conic-gradient(from calc(var(--hover-angle) - 37deg), #000 0deg 74deg, transparent 74deg);
+    mask-composite: intersect;
+    filter: drop-shadow(0 0 4px var(--accent-color));
+    transition: --hover-angle 150ms var(--ease);
+  }
+
+  .connector {
+    background: color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+
+  &.active > .connector {
+    background: var(--accent-color);
+  }
+}
+
+.center-text {
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent-color) 50%, transparent);
+}

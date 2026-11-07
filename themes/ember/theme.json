@@ -1,0 +1,40 @@
+{
+  "name": "Ember",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Warm amber on black, with a segmented meter that lights up towards your pointer.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "radial-gradient(circle at 40% 30%, #3b2a1e, #0d0906 70%)",
+  "presets": [
+    "Ice",
+    "Lime",
+    "Nixie"
+  ],
+  "colors": {
+    "accent-color": "#ff9f2e",
+    "surface-color": "#0b0806",
+    "text-color": "#ffd59a",
+    "wedge-highlight-color": "rgba(255, 159, 46, 0.12)"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    },
+    {
+      "class": "lit",
+      "content": "none"
+    },
+    {
+      "class": "meter",
+      "content": "none"
+    }
+  ]
+}

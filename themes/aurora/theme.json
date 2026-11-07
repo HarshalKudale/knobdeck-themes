@@ -1,0 +1,38 @@
+{
+  "name": "Aurora",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Dark glass with a slowly turning aurora glow behind the center.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "radial-gradient(circle at 50% 30%, #1b2440, #070a12 70%)",
+  "presets": [
+    "Ocean",
+    "Rose",
+    "Solar"
+  ],
+  "colors": {
+    "aurora-1": "#3cf0c5",
+    "aurora-2": "#5b8cff",
+    "aurora-3": "#b45bff",
+    "glass-color": "rgba(12, 18, 34, 0.88)",
+    "icon-color": "rgba(235, 242, 255, 0.9)",
+    "text-color": "#f2f6ff"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    },
+    {
+      "class": "aura",
+      "content": "none"
+    }
+  ]
+}
