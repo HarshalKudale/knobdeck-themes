@@ -1,0 +1,31 @@
+{
+  "name": "Phosphor",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "A green-screen terminal: square tiles, scanlines and glowing monospace labels.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 82,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "radial-gradient(circle at 50% 40%, #12301a, #020403 75%)",
+  "presets": [
+    "Amber",
+    "Cyan",
+    "White"
+  ],
+  "colors": {
+    "accent-color": "#39ff6a",
+    "surface-color": "rgba(0, 12, 3, 0.9)",
+    "wedge-highlight-color": "rgba(57, 255, 106, 0.1)"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

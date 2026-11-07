@@ -1,0 +1,46 @@
+{
+  "name": "Analog",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "A hardware synth knob: knurled metal, tick marks and an LED arc that follows your pointer.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 72,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(160deg, #2e3036, #111215)",
+  "presets": [
+    "Blue",
+    "Green",
+    "Red",
+    "White"
+  ],
+  "colors": {
+    "accent-color": "#ff7a1a",
+    "icon-color": "#c9ccd2",
+    "text-color": "#eceef1",
+    "tick-color": "rgba(255, 255, 255, 0.2)",
+    "wedge-highlight-color": "rgba(255, 122, 26, 0.1)"
+  },
+  "layers": [
+    {
+      "class": "notch",
+      "content": "none"
+    },
+    {
+      "class": "face",
+      "content": "icon"
+    },
+    {
+      "class": "leds",
+      "content": "none"
+    },
+    {
+      "class": "ticks",
+      "content": "none"
+    }
+  ]
+}

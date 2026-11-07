@@ -1,0 +1,40 @@
+{
+  "name": "Bloom",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Soft petals in pastel colours that shift with their direction around the dial.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(135deg, #fdfbfb, #e4e7ea)",
+  "presets": [
+    "Dusk",
+    "Mint",
+    "Vivid"
+  ],
+  "colors": {
+    "hue-shift": "0deg",
+    "petal-saturation": "85%",
+    "petal-lightness": "84%",
+    "face-color": "rgba(255, 255, 255, 0.94)",
+    "icon-lightness": "34%",
+    "text-color": "#3b2f45",
+    "center-a": "#ffffff",
+    "center-b": "#fdeef6"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    },
+    {
+      "class": "petal",
+      "content": "none"
+    }
+  ]
+}

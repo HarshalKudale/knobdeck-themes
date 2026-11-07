@@ -1,0 +1,189 @@
+/* Graphite: Machined aluminium: a spun-metal center, brushed buttons and engraved icons.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+.menu-node {
+  --child-distance: 112px;
+  --grandchild-distance: 21px;
+  --center-size: 92px;
+  --child-size: 50px;
+  --child-size-base: 50px;
+  --grandchild-size: 7px;
+  --connector-width: 5px;
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --menu-transition: all 300ms var(--ease);
+
+  .face {
+    border-radius: 50%;
+    color: var(--icon-color);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.25),
+      0 0 0 1px var(--metal-edge),
+      0 7px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .face svg {
+    filter: drop-shadow(0 1px 0 var(--engrave-color));
+  }
+
+  /* Spun metal: concentric grooves. */
+  &.active > .face {
+    background:
+      repeating-radial-gradient(circle, rgba(0, 0, 0, 0.045) 0 1px, transparent 1px 3px),
+      radial-gradient(circle at 35% 25%, var(--metal-hi), var(--metal-lo) 80%);
+  }
+
+  /* Brushed metal on the buttons. */
+  &.parent > .face,
+  &.child > .face {
+    background:
+      repeating-conic-gradient(rgba(255, 255, 255, 0.08) 0deg 1deg, rgba(0, 0, 0, 0.04) 1deg 2deg),
+      radial-gradient(circle at 35% 25%, var(--metal-hi), var(--metal-lo) 85%);
+  }
+
+  /* Hovered: anodised in the accent colour. */
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: var(--on-accent-color);
+    background:
+      repeating-conic-gradient(rgba(255, 255, 255, 0.1) 0deg 1deg, rgba(0, 0, 0, 0.06) 1deg 2deg),
+      radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--accent-color) 70%, #fff), var(--accent-color) 85%);
+
+    & svg {
+      filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  &.grandchild > .face {
+    background: var(--metal-lo);
+    box-shadow: 0 0 0 1px var(--metal-edge);
+  }
+
+  .connector {
+    background: linear-gradient(var(--metal-hi), var(--metal-lo));
+    box-shadow: 0 0 0 1px var(--metal-edge);
+  }
+
+  &.active > .connector {
+    background: var(--accent-color);
+  }
+}
+
+.center-text {
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  text-shadow: 0 1px 0 var(--engrave-color);
+}

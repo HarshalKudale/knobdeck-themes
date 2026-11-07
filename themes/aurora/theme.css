@@ -1,0 +1,199 @@
+/* Aurora: Dark glass with a slowly turning aurora glow behind the center.
+   A KnobDeck dial theme (CC0-1.0). Colours come from theme.json and presets/. */
+
+/* ── Structure: where nodes sit and how big they are in each state ── */
+
+.menu-node {
+  --ring-distance: max(var(--child-distance), var(--sibling-spacing, 10.5px) * var(--sibling-count));
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  &.grandchild {
+    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  .face {
+    position: absolute;
+    z-index: 1;
+    transition: var(--menu-transition), background 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  }
+
+  .icon-container {
+    opacity: 0;
+    transition: opacity 160ms ease, color 120ms ease;
+  }
+
+  &.active > .face > .icon-container,
+  &.parent > .face > .icon-container,
+  &.child > .face > .icon-container {
+    opacity: 1;
+  }
+
+  /* With a child hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active > .face {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  &.parent > .face,
+  &.child > .face {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.grandchild > .face {
+    top: calc(var(--grandchild-size) / -2);
+    left: calc(var(--grandchild-size) / -2);
+    width: var(--grandchild-size);
+    height: var(--grandchild-size);
+  }
+
+  &.slider-step.child > .face {
+    --child-size: calc(var(--child-size-base, 50px) * 0.76);
+    font-size: 0.9em;
+  }
+
+  &.hovered.clicked > .face {
+    scale: 0.92;
+  }
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+}
+
+.center-text {
+  transition: opacity 160ms ease;
+}
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color, transparent);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color, transparent) var(--width),
+      var(--wedge-color, transparent) var(--width)
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node > *,
+  .menu-node > * > * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Look ── */
+
+@keyframes aurora-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.menu-node {
+  --child-distance: 114px;
+  --grandchild-distance: 21px;
+  --center-size: 90px;
+  --child-size: 50px;
+  --child-size-base: 50px;
+  --grandchild-size: 7px;
+  --connector-width: 2px;
+  --aura-size: 140px;
+  --aurora: conic-gradient(var(--aurora-1), var(--aurora-2), var(--aurora-3), var(--aurora-1));
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --menu-transition: all 340ms var(--ease);
+
+  .face {
+    border-radius: 50%;
+    color: var(--icon-color);
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--glass-color), var(--glass-color)) padding-box,
+      linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)) border-box;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .aura {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  &.active > .aura {
+    display: block;
+    top: calc(var(--aura-size) / -2);
+    left: calc(var(--aura-size) / -2);
+    width: var(--aura-size);
+    height: var(--aura-size);
+    background: var(--aurora);
+    filter: blur(22px);
+    opacity: 0.75;
+    animation: aurora-turn 9s linear infinite;
+  }
+
+  &.active:has(> .hovered) > .aura {
+    opacity: 0.95;
+  }
+
+  &.child.hovered > .face,
+  &.parent.hovered > .face {
+    color: #fff;
+    border-width: 2px;
+    background:
+      linear-gradient(var(--glass-color), var(--glass-color)) padding-box,
+      var(--aurora) border-box;
+    box-shadow:
+      0 0 18px color-mix(in srgb, var(--aurora-2) 55%, transparent),
+      0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  &.grandchild > .face {
+    border: 0;
+    background: var(--aurora-1);
+    box-shadow: none;
+  }
+
+  .connector {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  &.active > .connector {
+    background: linear-gradient(90deg, var(--aurora-1), var(--aurora-3));
+  }
+}
+
+.center-text {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}

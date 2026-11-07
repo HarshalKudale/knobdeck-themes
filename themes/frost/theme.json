@@ -1,0 +1,34 @@
+{
+  "name": "Frost",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Frosted glass discs with a soft sheen. Looks best over a colourful wallpaper.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(135deg, #ff9a8b, #a18cd1 50%, #5ee7df)",
+  "presets": [
+    "Ice",
+    "Rose",
+    "Smoke"
+  ],
+  "colors": {
+    "glass-color": "rgba(255, 255, 255, 0.22)",
+    "glass-hover-color": "rgba(255, 255, 255, 0.42)",
+    "edge-color": "rgba(255, 255, 255, 0.45)",
+    "icon-color": "#ffffff",
+    "text-color": "#ffffff",
+    "shadow-color": "rgba(20, 10, 40, 0.22)"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

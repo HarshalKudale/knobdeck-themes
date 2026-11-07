@@ -1,0 +1,34 @@
+{
+  "name": "Neon Grid",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Synthwave: a striped sunset over a glowing grid, ringed by neon buttons.",
+  "engineVersion": 1,
+  "maxMenuRadius": 180,
+  "centerTextWrapWidth": 80,
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "linear-gradient(#0d0221, #2a0845)",
+  "presets": [
+    "Laser",
+    "Miami",
+    "Toxic"
+  ],
+  "colors": {
+    "accent-color": "#ff2bd6",
+    "accent-2-color": "#4df3ff",
+    "sun-top": "#ffd34e",
+    "sun-bottom": "#ff3d7f",
+    "night-color": "#16052b",
+    "text-color": "#ffffff"
+  },
+  "layers": [
+    {
+      "class": "face",
+      "content": "icon"
+    }
+  ]
+}

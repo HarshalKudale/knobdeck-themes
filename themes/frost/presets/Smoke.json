@@ -1,0 +1,7 @@
+{
+  "colors": {
+    "glass-color": "rgba(20, 22, 30, 0.42)",
+    "glass-hover-color": "rgba(20, 22, 30, 0.62)",
+    "edge-color": "rgba(255, 255, 255, 0.22)"
+  }
+}
