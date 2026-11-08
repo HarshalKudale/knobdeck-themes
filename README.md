@@ -40,13 +40,22 @@ The dial engine is `Knobdeck/app/src/dial/overlay/` (Kando's theme format, engin
 | `presets` | Names of `presets/<Name>.json` files (`{"colors": {...}}`). The app offers them as chips. |
 | `centerTextWrapWidth` | Diameter the hovered item's name wraps into. |
 | `drawChildrenBelow`, `drawCenterText`, `drawSelectionWedges`, `drawWedgeSeparators` | Engine switches. |
+| `sliderStyle` | `"steps"` (default): a slider opens as 16 value items on the ring. `"track"`: 51 value stops become invisible hit targets and the theme draws one arc (see the slider hooks below). |
+| `dynamicCenter` | Optional `{ childDistance, itemSpacing, childSize, gap, growth, minSize, maxSize, textRatio }` in px, mirroring the theme CSS. When set, a dynamic ring's center starts at `minSize` and grows `growth` px for each px the ring widens past `childDistance` (staying `gap` clear of the items, up to `maxSize`), the engine sets `--dynamic-center-size` on it, and the hovered item's text wraps into `size × textRatio`. |
 | `previewBackground` | CSS background for the preview tool only; the app ignores it. |
 
 **What the CSS can use**
 
 - Node classes: `active` (the center), `child` (its ring), `grandchild` (dots of a submenu), `parent`
   (the menu you came from), `hovered`, `clicked`, `dragged`, `level-<n>`, `type-<root|submenu|button|…>`,
-  `left/right/top/bottom`, `slider-step`.
+  `left/right/top/bottom`, `slider-step`, `slider-menu` (a slider), `dynamic-menu` (a plugin-filled
+  ring), `current` (the slider stop nearest the live value), `slider-previewing` (an open slider while
+  a value is hovered). The layer holding the icon also gets `kd-icon-layer`.
+- Set on an open slider's node: `--slider-start-angle`, `--slider-end-angle`, `--slider-span`,
+  `--slider-fill` (from the start to the hovered or current value; registered as an inherited
+  `<angle>`, so it animates and a layer's `::before` can use it) and `--slider-value` (the live
+  value as a CSS string, for `content`).
+- Set on an open dynamic ring's node (with `dynamicCenter`): `--dynamic-center-size`.
 - Set on each node: `--dir-x`, `--dir-y` (unit direction), `--angle` (0deg = up, clockwise),
   `--sibling-count`, `--start-angle` / `--end-angle` (its wedge), `--parent-angle`.
 - Set on layer divs of the center (animatable): `--pointer-angle`, `--hover-angle`,
