@@ -4,6 +4,7 @@
 import engineCss from "ENGINE/dial.css";
 import { Menu } from "ENGINE/menu.js";
 import { CenterText, MenuTheme } from "ENGINE/theme.js";
+import { toMenuItems } from "ENGINE/tree.js";
 
 const ICONS = window.ICONS ?? {};
 const item = (name, icon, extra) => ({ type: "button", name, icon, ...extra });
@@ -23,6 +24,12 @@ const SAMPLE = {
     item("Volume", "volume-2"),
   ],
 };
+
+/** A profile slider as the engine builds it for the loaded theme (a dial scale on a "track" theme). */
+const sliderItem = (kind) => toMenuItems(
+  [{ id: "volume", label: "Volume", icon: "volume-2", kind: { type: "slider", ...kind } }],
+  { sliderScale: theme.sliderStyle === "track", numberKeys: false },
+)[0];
 
 const style = document.createElement("style");
 style.textContent = engineCss;
@@ -54,6 +61,20 @@ window.harness = {
   show(menuDef = SAMPLE) {
     const c = { x: innerWidth / 2, y: innerHeight / 2 };
     menu.show(structuredClone(menuDef), { mousePosition: c, windowSize: { x: innerWidth, y: innerHeight } });
+  },
+  /**
+   * A menu whose slider (`kind`: min, max, step, unit) is open at `value`. Returns the slider's
+   * center, to aim the pointer at its scale.
+   */
+  slider(value = 40, kind = { min: 0, max: 100, step: 1, unit: "%" }) {
+    const slider = sliderItem(kind);
+    slider.sliderValue = value;
+    slider.angle = 0;
+    this.show({ type: "root", name: "Test", icon: "sparkles", children: [
+      slider, item("Play / Pause", "play"), item("Next Track", "skip-forward"), item("Mute Mic", "mic-off"),
+    ] });
+    menu.openSubmenu(menu.root.children[0], { x: innerWidth / 2, y: innerHeight / 2 });
+    return menu.getCenterItemPosition();
   },
   /** A menu with `n` buttons (layout stress tests). */
   sized(n, longLabels = false) {

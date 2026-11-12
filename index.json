@@ -1,38 +1,38 @@
 {
   "analog": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "aurora": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "bloom": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "contrast": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "ember": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "frost": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "graphite": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "mono-line": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "neon-grid": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "paper": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "phosphor": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "studio": {
-    "version": "1.0.0"
+    "version": "1.1.0"
   }
 }

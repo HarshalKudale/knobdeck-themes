@@ -40,21 +40,31 @@ The dial engine is `Knobdeck/app/src/dial/overlay/` (Kando's theme format, engin
 | `presets` | Names of `presets/<Name>.json` files (`{"colors": {...}}`). The app offers them as chips. |
 | `centerTextWrapWidth` | Diameter the hovered item's name wraps into. |
 | `drawChildrenBelow`, `drawCenterText`, `drawSelectionWedges`, `drawWedgeSeparators` | Engine switches. |
-| `sliderStyle` | `"steps"` (default): a slider opens as 16 value items on the ring. `"track"`: 51 value stops become invisible hit targets and the theme draws one arc (see the slider hooks below). |
+| `sliderStyle` | `"track"` (every theme here): a slider opens as a dial scale. Each value stop is a tick: every step of the slider, or every 2nd / 5th / 10th… when that is more than 61, spread over 300°. See the slider hooks below. `"steps"` (default when absent): 16 value items on the ring. |
 | `dynamicCenter` | Optional `{ childDistance, itemSpacing, childSize, gap, growth, minSize, maxSize, textRatio }` in px, mirroring the theme CSS. When set, a dynamic ring's center starts at `minSize` and grows `growth` px for each px the ring widens past `childDistance` (staying `gap` clear of the items, up to `maxSize`), the engine sets `--dynamic-center-size` on it, and the hovered item's text wraps into `size × textRatio`. |
 | `previewBackground` | CSS background for the preview tool only; the app ignores it. |
 
 **What the CSS can use**
 
-- Node classes: `active` (the center), `child` (its ring), `grandchild` (dots of a submenu), `parent`
-  (the menu you came from), `hovered`, `clicked`, `dragged`, `level-<n>`, `type-<root|submenu|button|…>`,
-  `left/right/top/bottom`, `slider-step`, `slider-menu` (a slider), `dynamic-menu` (a plugin-filled
-  ring), `current` (the slider stop nearest the live value), `slider-previewing` (an open slider while
-  a value is hovered). The layer holding the icon also gets `kd-icon-layer`.
+- Node classes: `active` (the center), `child` (its ring), `parent` (the menu you came from),
+  `grandchild` (items of a closed submenu: the engine hides them, so don't draw them as dots),
+  `hovered`, `clicked`, `dragged`, `level-<n>`, `type-<root|submenu|button|…>`,
+  `left/right/top/bottom`, `dynamic-menu` (a plugin-filled ring). The layer holding the icon also
+  gets `kd-icon-layer`.
+- Sliders: `slider-menu` (the slider; `kd-scale` too on a `"track"` theme), `slider-previewing`
+  (while a value is hovered), and on its stops `slider-step`, `current` (nearest the live value),
+  `filled` (up to the hovered or live value), `major` with `data-tick="<number>"` (a round value
+  the scale should number). On a `"track"` theme the slider node also holds a `.kd-scale-plate`
+  div (behind everything) for the theme to size and paint.
 - Set on an open slider's node: `--slider-start-angle`, `--slider-end-angle`, `--slider-span`,
   `--slider-fill` (from the start to the hovered or current value; registered as an inherited
-  `<angle>`, so it animates and a layer's `::before` can use it) and `--slider-value` (the live
-  value as a CSS string, for `content`).
+  `<angle>`, so it animates and a layer's `::before` can use it), `--slider-value` (the live
+  value as a CSS string, for `content`) and `--slider-readout` (the hovered value, else the live
+  one; the engine prints no center text for a scale's stops).
+- The themes here share one "Sliders: a dial scale" block at the end of `theme.css`: ticks are the
+  stops' `::before`, numbers their `::after`, the pointer and the readout the slider's `::after` /
+  `::before`. A theme only sets the `--scale-*` sizes and colours above it and paints the plate.
+  `filled`, `major`, the plate and `--slider-readout` need an app newer than 0.3.2; older ones show plain ticks.
 - Set on an open dynamic ring's node (with `dynamicCenter`): `--dynamic-center-size`.
 - Set on each node: `--dir-x`, `--dir-y` (unit direction), `--angle` (0deg = up, clockwise),
   `--sibling-count`, `--start-angle` / `--end-angle` (its wedge), `--parent-angle`.
@@ -68,7 +78,8 @@ The dial engine is `Knobdeck/app/src/dial/overlay/` (Kando's theme format, engin
 **Checklist before shipping a theme**
 
 Run `node scripts/preview/preview.mjs check <id>` and `presets <id>` and look at `out/check/`:
-idle and hovered, an open submenu, 4 / 8 / 12 items, long labels, every preset. Then make the GIF
+idle and hovered, an open submenu, 4 / 8 / 12 items, long labels, an open slider (at rest, with
+a value hovered, and a coarse 0–10 one), every preset (menu and slider). Then make the GIF
 with `node scripts/preview/preview.mjs gif <id>`. `serve <id>` gives a page to try it with the mouse.
 The tool needs this workspace layout (`../Knobdeck` with `npm install` done in `app/`,
 `../knobdeck-launch-video` for Playwright), ffmpeg, and a Chromium-based browser (`BROWSER=...`).

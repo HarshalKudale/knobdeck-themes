@@ -2,8 +2,10 @@
 //
 //   node scripts/preview/preview.mjs gif   [id...]   previews/<id>.gif (the registry preview)
 //   node scripts/preview/preview.mjs check [id...]   out/check/<id>.png: 4/8/12 items, long labels,
-//                                                    an open submenu, hovered and idle states
-//   node scripts/preview/preview.mjs presets [id...] out/check/<id>-presets.png: every preset, hovered
+//                                                    an open submenu, hovered and idle states,
+//                                                    an open slider at rest and while a value is hovered
+//   node scripts/preview/preview.mjs presets [id...] out/check/<id>-presets.png: every preset, hovered,
+//                                                    and with a slider open
 //   node scripts/preview/preview.mjs serve [id]      a local page to try a theme with the mouse
 //
 // No ids = every theme in themes/. `knobdeck-dark` / `knobdeck-light` are the app's built-ins
@@ -48,7 +50,7 @@ const bundle = (await esbuild.build({
   bundle: true,
   write: false,
   format: "esm",
-  alias: { ENGINE },
+  alias: { ENGINE, "@": join(APP, "src") },
   loader: { ".css": "text" },
 })).outputFiles[0].text;
 
@@ -177,14 +179,26 @@ async function check(id) {
     ["8 items", 8, 45],
     ["12 items", 12, 30],
     ["long labels", -6, 60],
+    ["slider", "slider", null],
+    ["slider hover", "slider", 60],
+    ["slider 0-10", "slider-coarse", null],
   ];
   const errors = [];
   for (const [label, n, hover] of cases) {
     const { p, ctx, errors: e } = await open(id, SIZE, 1);
     await p.mouse.move(SIZE / 2, SIZE / 2);
-    await p.evaluate(([n]) => window.harness.show(n == null ? undefined : window.harness.sized(Math.abs(n), n < 0)), [n]);
+    let sliderCenter = null;
+    if (n === "slider") sliderCenter = await p.evaluate(() => window.harness.slider(40));
+    else if (n === "slider-coarse") sliderCenter = await p.evaluate(() => window.harness.slider(7, { min: 0, max: 10, step: 1 }));
+    else await p.evaluate(([n]) => window.harness.show(n == null ? undefined : window.harness.sized(Math.abs(n), n < 0)), [n]);
     await sleep(300);
-    if (hover === "submenu") {
+    if (sliderCenter) {
+      await sleep(300);
+      if (hover != null) {
+        const d = at(0, 95, hover);
+        await p.mouse.move(sliderCenter.x + d.x, sliderCenter.y + d.y, { steps: 6 });
+      }
+    } else if (hover === "submenu") {
       // "Folders" is the third of seven items: ~103°.
       const q = at(SIZE, 110, 103);
       await p.mouse.move(q.x, q.y, { steps: 6 });
@@ -202,7 +216,7 @@ async function check(id) {
     await ctx.close();
   }
   // One contact sheet per theme.
-  const ctx = await browser.newContext({ viewport: { width: SIZE * 4, height: SIZE * 2 + 40 } });
+  const ctx = await browser.newContext({ viewport: { width: SIZE * 4, height: SIZE * Math.ceil(shots.length / 4) + 40 } });
   const sheet = await ctx.newPage();
   await sheet.setContent(`<body style="margin:0;display:grid;grid-template-columns:repeat(4,${SIZE}px);background:#111;font:12px sans-serif;color:#ccc">
     ${shots.map((s) => `<figure style="margin:0;position:relative"><img src="data:image/png;base64,${s.png}" width="${SIZE}" height="${SIZE}"><figcaption style="position:absolute;top:4px;left:6px">${s.label}</figcaption></figure>`).join("")}
@@ -217,6 +231,7 @@ async function presets(id) {
   const SIZE = 360;
   const names = [null, ...(JSON.parse(readFileSync(join(themeDir(id), "theme.json"), "utf8")).presets ?? [])];
   const shots = [];
+  const sliders = [];
   for (const name of names) {
     const { p, ctx } = await open(id, SIZE, 1, name);
     await p.mouse.move(SIZE / 2, SIZE / 2);
@@ -226,11 +241,19 @@ async function presets(id) {
     await p.mouse.move(q.x, q.y, { steps: 6 });
     await sleep(500);
     shots.push({ label: name ?? "Default", png: (await p.screenshot()).toString("base64") });
+    // The same preset with a slider open and a value hovered.
+    const c = await p.evaluate(() => window.harness.slider(40));
+    await sleep(600);
+    const d = at(0, 95, 60);
+    await p.mouse.move(c.x + d.x, c.y + d.y, { steps: 6 });
+    await sleep(400);
+    sliders.push({ label: `${name ?? "Default"}, slider`, png: (await p.screenshot()).toString("base64") });
     await ctx.close();
   }
-  const ctx = await browser.newContext({ viewport: { width: SIZE * names.length, height: SIZE } });
+  shots.push(...sliders);
+  const ctx = await browser.newContext({ viewport: { width: SIZE * names.length, height: SIZE * 2 } });
   const sheet = await ctx.newPage();
-  await sheet.setContent(`<body style="margin:0;display:flex;font:12px sans-serif;color:#fff">${shots.map((s) =>
+  await sheet.setContent(`<body style="margin:0;display:grid;grid-template-columns:repeat(${names.length},${SIZE}px);font:12px sans-serif;color:#fff">${shots.map((s) =>
     `<figure style="margin:0;position:relative"><img src="data:image/png;base64,${s.png}" width="${SIZE}" height="${SIZE}"><figcaption style="position:absolute;top:4px;left:6px;text-shadow:0 0 3px #000">${s.label}</figcaption></figure>`).join("")}</body>`);
   mkdirSync(join(REPO, "out", "check"), { recursive: true });
   await sheet.screenshot({ path: join(REPO, "out", "check", `${id}-presets.png`) });

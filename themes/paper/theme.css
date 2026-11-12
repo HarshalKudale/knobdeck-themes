@@ -11,10 +11,6 @@
     transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
   }
 
-  &.grandchild {
-    transform: translate(calc(var(--grandchild-distance) * var(--dir-x)), calc(var(--grandchild-distance) * var(--dir-y)));
-  }
-
   &.dragged {
     transition: none;
   }
@@ -54,18 +50,6 @@
     left: calc(var(--child-size) / -2);
     width: var(--child-size);
     height: var(--child-size);
-  }
-
-  &.grandchild > .face {
-    top: calc(var(--grandchild-size) / -2);
-    left: calc(var(--grandchild-size) / -2);
-    width: var(--grandchild-size);
-    height: var(--grandchild-size);
-  }
-
-  &.slider-step.child > .face {
-    --child-size: calc(var(--child-size-base, 50px) * 0.76);
-    font-size: 0.9em;
   }
 
   &.hovered.clicked > .face {
@@ -114,11 +98,9 @@
 
 .menu-node {
   --child-distance: 114px;
-  --grandchild-distance: 21px;
   --center-size: 92px;
   --child-size: 50px;
   --child-size-base: 50px;
-  --grandchild-size: 7px;
   --connector-width: 2.5px;
   --ease: cubic-bezier(0.3, 1.3, 0.5, 1);
   --menu-transition: all 300ms var(--ease);
@@ -153,11 +135,6 @@
     box-shadow: inset 0 0 0 2px var(--ink-color), 1px 1px 0 var(--ink-color);
   }
 
-  &.grandchild > .face {
-    background: var(--ink-color);
-    box-shadow: none;
-  }
-
   .connector {
     background: repeating-linear-gradient(90deg, var(--ink-color) 0 6px, transparent 6px 10px);
   }
@@ -173,4 +150,172 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 17px;
+}
+
+/* ── Sliders: a dial scale (`sliderStyle: "track"`) ──
+   A slider opens as a knob on a plate. Every value it can take is a tick on the scale; the
+   engine numbers the round ones (`major`, `data-tick`) and lights the ones up to the value
+   (`filled`). */
+
+.menu-node {
+  --scale-plate-size: 220px;
+  --scale-radius: 100px;
+  --scale-tick-length: 6px;
+  --scale-major-length: 12px;
+  --scale-tick-width: 1.5px;
+  --scale-major-width: 2.5px;
+  --scale-label-radius: 75px;
+  --scale-pointer-radius: calc(var(--center-size) / 2 - 5px);
+  --scale-pointer-length: 12px;
+  --scale-pointer-width: 3px;
+  --scale-tick-color: color-mix(in srgb, var(--ink-color) 45%, transparent);
+  --scale-lit-color: var(--ink-color);
+  --scale-label-color: color-mix(in srgb, var(--ink-color) 70%, transparent);
+  --scale-label-lit-color: var(--ink-color);
+  --scale-font: 700 11px/1 "Chalkboard SE", "Comic Neue", "Segoe Print", "Bradley Hand", cursive;
+  --scale-pointer-color: var(--ink-color);
+  --scale-value-color: var(--ink-color);
+  --scale-value-font: 700 19px/1 "Chalkboard SE", "Comic Neue", "Segoe Print", "Bradley Hand", cursive;
+}
+
+.menu-node.slider-menu {
+  /* The plate under the scale (a div the engine adds). */
+  & > .kd-scale-plate {
+    top: calc(var(--scale-plate-size) / -2);
+    left: calc(var(--scale-plate-size) / -2);
+    width: var(--scale-plate-size);
+    height: var(--scale-plate-size);
+    border-radius: 50%;
+    opacity: 0;
+    scale: 0.6;
+    transition: var(--menu-transition);
+  }
+
+  &.active > .kd-scale-plate {
+    opacity: 1;
+    scale: 1;
+  }
+
+  /* The pointer keeps up with the value, whatever the menu's own easing. */
+  &.active {
+    transition: var(--menu-transition), --slider-fill 90ms linear;
+  }
+
+  /* A value stop is a tick: it grows inwards from the scale's radius. */
+  &.active > .slider-step.child {
+    --tick-length: var(--scale-tick-length);
+    --tick-width: var(--scale-tick-width);
+    transform: none;
+    scale: none;
+    transition: opacity 160ms ease;
+
+    & > * {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: calc(var(--tick-width) / -2);
+      width: var(--tick-width);
+      height: var(--tick-length);
+      border-radius: var(--scale-tick-cap, 1px);
+      background: var(--scale-tick-color);
+      box-shadow: var(--scale-tick-shadow, none);
+      transform-origin: 50% 0;
+      transform: rotate(var(--angle)) translateY(calc(-1 * var(--scale-radius)));
+    }
+
+    &.major {
+      --tick-length: var(--scale-major-length);
+      --tick-width: var(--scale-major-width);
+    }
+
+    &.hovered {
+      --tick-length: calc(var(--scale-major-length) + 3px);
+      --tick-width: var(--scale-major-width);
+    }
+
+    /* Lit up to the value; `current` stays lit while another value is hovered. */
+    &.filled::before,
+    &.current::before,
+    &.hovered::before {
+      background: var(--scale-lit-color);
+      box-shadow: var(--scale-lit-glow, var(--scale-tick-shadow, none));
+    }
+
+    /* The number of a major tick. */
+    &.major::after {
+      content: attr(data-tick);
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(
+        calc(var(--dir-x) * var(--scale-label-radius) - 50%),
+        calc(var(--dir-y) * var(--scale-label-radius) - 50%)
+      );
+      color: var(--scale-label-color);
+      font: var(--scale-font);
+      font-variant-numeric: tabular-nums;
+      text-shadow: var(--scale-label-shadow, none);
+      white-space: nowrap;
+    }
+
+    &.major.filled::after,
+    &.major.hovered::after {
+      color: var(--scale-label-lit-color);
+    }
+  }
+
+  /* The pointer on the knob. */
+  &.active::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: calc(var(--scale-pointer-width) / -2);
+    width: var(--scale-pointer-width);
+    height: var(--scale-pointer-length);
+    border-radius: var(--scale-pointer-width);
+    background: var(--scale-pointer-color);
+    box-shadow: var(--scale-pointer-glow, none);
+    transform-origin: 50% 0;
+    transform: rotate(calc(var(--slider-start-angle) + var(--slider-fill))) translateY(calc(-1 * var(--scale-pointer-radius)));
+    pointer-events: none;
+  }
+
+  /* The knob reads out the value: the hovered one, else the live one. */
+  &.active > .face > .icon-container {
+    opacity: 0;
+  }
+
+  &.active::before {
+    content: var(--slider-readout, var(--slider-value, ""));
+    position: absolute;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+    color: var(--scale-value-color);
+    font: var(--scale-value-font);
+    font-variant-numeric: tabular-nums;
+    text-shadow: var(--scale-value-shadow, none);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Apps up to 0.3.2 print the hovered value as center text instead. */
+  &.active.slider-previewing:not(.kd-scale)::before {
+    opacity: 0;
+  }
+}
+
+/* A sheet under the knob, drawn by hand like the rest. */
+.menu-node.slider-menu > .kd-scale-plate {
+  border-radius: 49% 51% 52% 48% / 51% 48% 52% 49%;
+  background:
+    radial-gradient(color-mix(in srgb, var(--ink-color) 5%, transparent) 1px, transparent 1px) 0 0 / 5px 5px,
+    var(--paper-color);
+  box-shadow:
+    inset 0 0 0 2px var(--ink-color),
+    4px 4px 0 var(--ink-color);
 }
