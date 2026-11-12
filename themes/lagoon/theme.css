@@ -1,0 +1,543 @@
+/* Lagoon: bevelled navy items floating over the desktop, a dark glass hub with a knurled
+   rim, and one aqua light on the item you pick. Midnight's geometry and motion; only the surface
+   differs. Depth is gradients and shadows only (no backdrop-filter), so opening stays fast.
+   KnobDeck's own theme (CC0-1.0). Colours come from theme.json; `accent-glow` is the light the
+   accent gives off, so presets change both. */
+
+.menu-node {
+  --child-distance: 112px;
+  --center-size: 92px;
+  --child-size: 52px;
+  --connector-width: 2px;
+  --arc-size: 112px;
+
+  /* Item faces: top-lit navy with a visible edge under them. */
+  --item-top: #2f3648;
+  --item-bottom: #1f2431;
+  --item-hover-top: #46557a;
+  --item-hover-bottom: #323c55;
+  --item-side: #141824;
+  --item-face:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.10), transparent 60%),
+    linear-gradient(var(--item-top), var(--item-bottom));
+  --item-hover-face:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.12), transparent 60%),
+    linear-gradient(var(--item-hover-top), var(--item-hover-bottom));
+  --lit-face:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.16), transparent 60%),
+    linear-gradient(var(--accent-glow), var(--accent-color));
+  --bevel: inset 0 1.5px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+  --float-shadow: 0 10px 18px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.45);
+  --lit-glow:
+    0 0 18px color-mix(in srgb, var(--accent-glow) 45%, transparent),
+    0 0 4px color-mix(in srgb, var(--accent-glow) 60%, transparent);
+
+  /* The hub: dark glass over graphite. */
+  --hub-top: #1b2230;
+  --hub-bottom: #0b0f15;
+  --hub-glass: #0b0f15;
+  --hub-glow: rgba(79, 111, 154, 0.28);
+  --hub-rim: #2a3346;
+  --hub-rim-dark: #1a2030;
+
+  /* A toggle in its warning state (muted, live, recording). */
+  --muted-face: #b8322b;
+  --muted-ring: #ff453a;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --menu-transition: all 280ms var(--ease);
+  --fade: opacity 160ms ease;
+  --ring-distance: max(var(--child-distance), 10.5px * var(--sibling-count));
+
+  transition: var(--menu-transition);
+
+  &.child {
+    transform: translate(calc(var(--ring-distance) * var(--dir-x)), calc(var(--ring-distance) * var(--dir-y)));
+  }
+
+  /* The hovered child steps out a little towards the pointer. */
+  &.active > .child.hovered {
+    transform: translate(
+      calc((var(--ring-distance) + 6px) * var(--dir-x)),
+      calc((var(--ring-distance) + 6px) * var(--dir-y))
+    );
+  }
+
+  &.dragged {
+    transition: none;
+  }
+
+  /* Discs ------------------------------------------------------------------------ */
+
+  /* An item: face, hairline rim, bevel, a 3 px edge and a shadow on the desktop below. */
+  .disc {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--surface-color);
+    background-image: var(--item-face);
+    box-shadow: inset 0 0 0 1px var(--line-color), var(--bevel), 0 3px 0 var(--item-side), var(--float-shadow);
+    transition: var(--menu-transition), box-shadow 120ms ease;
+    z-index: 1;
+  }
+
+  /* Lucide icons at 52% of the item. */
+  &.child > .disc,
+  &.parent > .disc {
+    & > .icon-container svg:not(.glyph) {
+      width: 52%;
+      height: 52%;
+    }
+  }
+
+  .icon-container {
+    color: var(--icon-color);
+    opacity: 0;
+    transition: var(--fade), color 120ms ease;
+  }
+
+  &.active > .disc,
+  &.parent > .disc,
+  &.child > .disc {
+    & > .icon-container {
+      opacity: 1;
+    }
+  }
+
+  &.active > .disc {
+    top: calc(var(--center-size) / -2);
+    left: calc(var(--center-size) / -2);
+    width: var(--center-size);
+    height: var(--center-size);
+  }
+
+  /* While a child is hovered, the center shows its name instead of an icon. */
+  &.active:has(> .hovered) > .disc > .icon-container {
+    opacity: 0;
+  }
+
+  &.parent > .disc,
+  &.child > .disc {
+    top: calc(var(--child-size) / -2);
+    left: calc(var(--child-size) / -2);
+    width: var(--child-size);
+    height: var(--child-size);
+  }
+
+  &.child.hovered > .disc,
+  &.parent.hovered > .disc {
+    background-color: var(--surface-hover-color);
+    background-image: var(--item-hover-face);
+    box-shadow: inset 0 0 0 1.5px var(--accent-color), var(--bevel), 0 3px 0 var(--item-side), var(--float-shadow);
+
+    & > .icon-container {
+      color: var(--icon-hover-color);
+    }
+  }
+
+  /* Lit: the item the pointer commits to. Saturated accent, a controlled glow; never washed to
+     white. */
+  &.child.hovered.clicked > .disc,
+  &.parent.hovered.clicked > .disc {
+    transform: scale(0.92);
+    background-color: var(--accent-color);
+    background-image: var(--lit-face);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), var(--bevel), var(--lit-glow), var(--float-shadow);
+
+    & > .icon-container {
+      color: #ffffff;
+    }
+  }
+
+  /* A toggle in its warning state: red face, a faint red light, a thin ring inside the rim.
+     The engine does not mark toggle states yet; this waits for it to add `kd-warn` to the item
+     while its state is a warning (mic muted, deafened, live, recording). */
+  &.kd-warn > .disc {
+    background-color: var(--muted-face);
+    background-image:
+      radial-gradient(circle closest-side, transparent calc(86% - 0.75px), var(--muted-ring) calc(86% - 0.75px) calc(86% + 0.75px), transparent calc(86% + 0.75px)),
+      radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.14), transparent 60%),
+      linear-gradient(#c8403a, #a12a24);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10), var(--bevel), 0 3px 0 #5a1612, 0 0 10px rgba(255, 69, 58, 0.35), var(--float-shadow);
+
+    & > .icon-container {
+      color: #ffffff;
+    }
+  }
+
+  /* The hub ----------------------------------------------------------------------- */
+
+  /* Dark glass over graphite: a graphite face, a glass disc at 80% with a cool inner glow, a
+     knurled rim (::before, 60 ridges) and one highlight arc (::after). Sliders keep their knob. */
+  &.active:not(.slider-menu) > .disc {
+    background-color: var(--hub-bottom);
+    background-image:
+      radial-gradient(circle at 45% 30%, rgba(255, 255, 255, 0.18), transparent 12%),
+      radial-gradient(
+        circle closest-side,
+        var(--hub-glass) 0,
+        var(--hub-glass) calc(100% - 22px),
+        var(--hub-glow) calc(100% - 9.5px),
+        rgba(255, 255, 255, 0.07) calc(100% - 9.5px),
+        rgba(255, 255, 255, 0.07) calc(100% - 9px),
+        transparent calc(100% - 9px)
+      ),
+      radial-gradient(circle at 50% 40%, var(--hub-top), var(--hub-bottom) 70%);
+    box-shadow: inset 0 0 0 1px var(--line-color), 0 14px 24px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.45);
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+
+    &::before {
+      inset: 0;
+      background: repeating-conic-gradient(var(--hub-rim) 0 3deg, var(--hub-rim-dark) 3deg 6deg);
+      mask: radial-gradient(closest-side, transparent calc(100% - 6px), #000 calc(100% - 5.5px));
+    }
+
+    /* 10 o'clock to 1 o'clock, at 72% of the radius. */
+    &::after {
+      inset: 13px;
+      border: 2.5px solid transparent;
+      border-top-color: rgba(255, 255, 255, 0.55);
+      transform: rotate(-15deg);
+      filter: blur(0.3px);
+    }
+  }
+
+  &.active:not(.slider-menu).clicked > .disc {
+    transform: scale(0.96);
+  }
+
+  /* Pointer arc: a short accent arc around the center that points at the hovered child. */
+  .arc {
+    position: absolute;
+    display: none;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &.active:has(> .hovered) > .arc {
+    display: block;
+    top: calc(var(--arc-size) / -2);
+    left: calc(var(--arc-size) / -2);
+    width: var(--arc-size);
+    height: var(--arc-size);
+    background: conic-gradient(
+      from calc(var(--hover-angle) - 22deg),
+      var(--accent-color) 0deg 44deg,
+      transparent 44deg
+    );
+    mask: radial-gradient(closest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px), #000 calc(100% - 0.5px), transparent 100%);
+    transition: --hover-angle 160ms var(--ease);
+  }
+
+  /* Connectors ------------------------------------------------------------------- */
+
+  .connector {
+    height: var(--connector-width);
+    top: calc(var(--connector-width) / -2);
+    background: var(--line-color);
+    transition: var(--menu-transition);
+  }
+
+  &:has(.dragged) > .connector {
+    transition: none;
+  }
+
+  &.active > .connector {
+    background: var(--accent-color);
+  }
+}
+
+
+/* Dynamic rings (plugin-filled, often many items): the center grows with the
+   ring (the engine sets --dynamic-center-size from theme.json `dynamicCenter`)
+   so the hovered item's title and content get room. ------------------------- */
+
+.menu-node.dynamic-menu.active > .disc {
+  --center-size: var(--dynamic-center-size, 92px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > .icon-container {
+    width: 92px;
+  }
+}
+
+/* ── Sliders: a dial scale (`sliderStyle: "track"`) ──
+   A slider opens as a knob on a plate. Every value it can take is a tick on the scale; the
+   engine numbers the round ones (`major`, `data-tick`) and lights the ones up to the value
+   (`filled`). */
+
+.menu-node {
+  --scale-plate-size: 216px;
+  --scale-radius: 100px;
+  --scale-tick-length: 6px;
+  --scale-major-length: 12px;
+  --scale-tick-width: 1.5px;
+  --scale-major-width: 2px;
+  --scale-label-radius: 75px;
+  --scale-pointer-radius: calc(var(--center-size) / 2 - 5px);
+  --scale-pointer-length: 12px;
+  --scale-pointer-width: 3px;
+  --scale-tick-color: #5d626b;
+  --scale-lit-color: var(--accent-color);
+  --scale-lit-glow: 0 0 4px color-mix(in srgb, var(--accent-glow) 60%, transparent);
+  --scale-pointer-glow: var(--scale-lit-glow);
+  --scale-label-color: #b9bcc2;
+  --scale-label-lit-color: var(--text-color);
+  --scale-font: 600 10px/1 system-ui, "Segoe UI", sans-serif;
+  --scale-pointer-color: var(--accent-color);
+  --scale-value-color: var(--text-color);
+  --scale-value-font: 600 20px/1 system-ui, "Segoe UI", sans-serif;
+}
+
+.menu-node.slider-menu {
+  /* The plate under the scale (a div the engine adds). */
+  & > .kd-scale-plate {
+    top: calc(var(--scale-plate-size) / -2);
+    left: calc(var(--scale-plate-size) / -2);
+    width: var(--scale-plate-size);
+    height: var(--scale-plate-size);
+    border-radius: 50%;
+    opacity: 0;
+    scale: 0.6;
+    transition: var(--menu-transition);
+  }
+
+  &.active > .kd-scale-plate {
+    opacity: 1;
+    scale: 1;
+  }
+
+  /* The pointer keeps up with the value, whatever the menu's own easing. */
+  &.active {
+    transition: var(--menu-transition), --slider-fill 90ms linear;
+  }
+
+  /* A value stop is a tick: it grows inwards from the scale's radius. */
+  &.active > .slider-step.child {
+    --tick-length: var(--scale-tick-length);
+    --tick-width: var(--scale-tick-width);
+    transform: none;
+    scale: none;
+    transition: opacity 160ms ease;
+
+    & > * {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: calc(var(--tick-width) / -2);
+      width: var(--tick-width);
+      height: var(--tick-length);
+      border-radius: var(--scale-tick-cap, 1px);
+      background: var(--scale-tick-color);
+      box-shadow: var(--scale-tick-shadow, none);
+      transform-origin: 50% 0;
+      transform: rotate(var(--angle)) translateY(calc(-1 * var(--scale-radius)));
+    }
+
+    &.major {
+      --tick-length: var(--scale-major-length);
+      --tick-width: var(--scale-major-width);
+    }
+
+    &.hovered {
+      --tick-length: calc(var(--scale-major-length) + 3px);
+      --tick-width: var(--scale-major-width);
+    }
+
+    /* Lit up to the value; `current` stays lit while another value is hovered. */
+    &.filled::before,
+    &.current::before,
+    &.hovered::before {
+      background: var(--scale-lit-color);
+      box-shadow: var(--scale-lit-glow, var(--scale-tick-shadow, none));
+    }
+
+    /* The number of a major tick. */
+    &.major::after {
+      content: attr(data-tick);
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(
+        calc(var(--dir-x) * var(--scale-label-radius) - 50%),
+        calc(var(--dir-y) * var(--scale-label-radius) - 50%)
+      );
+      color: var(--scale-label-color);
+      font: var(--scale-font);
+      font-variant-numeric: tabular-nums;
+      text-shadow: var(--scale-label-shadow, none);
+      white-space: nowrap;
+    }
+
+    &.major.filled::after,
+    &.major.hovered::after {
+      color: var(--scale-label-lit-color);
+    }
+  }
+
+  /* The pointer on the knob. */
+  &.active::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: calc(var(--scale-pointer-width) / -2);
+    width: var(--scale-pointer-width);
+    height: var(--scale-pointer-length);
+    border-radius: var(--scale-pointer-width);
+    background: var(--scale-pointer-color);
+    box-shadow: var(--scale-pointer-glow, none);
+    transform-origin: 50% 0;
+    transform: rotate(calc(var(--slider-start-angle) + var(--slider-fill))) translateY(calc(-1 * var(--scale-pointer-radius)));
+    pointer-events: none;
+  }
+
+  /* The knob reads out the value: the hovered one, else the live one. */
+  &.active > .disc > .icon-container {
+    opacity: 0;
+  }
+
+  &.active::before {
+    content: var(--slider-readout, var(--slider-value, ""));
+    position: absolute;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+    color: var(--scale-value-color);
+    font: var(--scale-value-font);
+    font-variant-numeric: tabular-nums;
+    text-shadow: var(--scale-value-shadow, none);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* Apps up to 0.3.2 print the hovered value as center text instead. */
+  &.active.slider-previewing:not(.kd-scale)::before {
+    opacity: 0;
+  }
+}
+
+.menu-node.slider-menu {
+  /* A dark plate floating over the desktop, like the items. */
+  & > .kd-scale-plate {
+    background: radial-gradient(circle at 50% 35%, #0d1118, #06080c 70%);
+    box-shadow: inset 0 0 0 1px #3a3f48, inset 0 1.5px 0 rgba(255, 255, 255, 0.06), 0 14px 28px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.45);
+  }
+
+  /* The scale shows the value; the pointer arc is for menus. */
+  &.active > .arc {
+    display: none;
+  }
+}
+
+/* ── Slider items: a gear edge ──
+   A slider reads as a knob: its item (and the knob of an open scale) has a cog outline
+   instead of the plain disc. The disc itself goes clear; ::before fills the gear and ::after
+   strokes its edge, both cut by an SVG mask (only the mask's alpha counts, so the colours
+   stay theme variables). */
+
+.menu-node.slider-menu {
+  --gear-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M43.86 8.45L45.44 1.72A48.5 48.5 0 0 1 54.56 1.72L56.14 8.45A42 42 0 0 1 65.46 10.95L70.19 5.90A48.5 48.5 0 0 1 78.10 10.47L76.09 17.08A42 42 0 0 1 82.92 23.91L89.53 21.90A48.5 48.5 0 0 1 94.10 29.81L89.05 34.54A42 42 0 0 1 91.55 43.86L98.28 45.44A48.5 48.5 0 0 1 98.28 54.56L91.55 56.14A42 42 0 0 1 89.05 65.46L94.10 70.19A48.5 48.5 0 0 1 89.53 78.10L82.92 76.09A42 42 0 0 1 76.09 82.92L78.10 89.53A48.5 48.5 0 0 1 70.19 94.10L65.46 89.05A42 42 0 0 1 56.14 91.55L54.56 98.28A48.5 48.5 0 0 1 45.44 98.28L43.86 91.55A42 42 0 0 1 34.54 89.05L29.81 94.10A48.5 48.5 0 0 1 21.90 89.53L23.91 82.92A42 42 0 0 1 17.08 76.09L10.47 78.10A48.5 48.5 0 0 1 5.90 70.19L10.95 65.46A42 42 0 0 1 8.45 56.14L1.72 54.56A48.5 48.5 0 0 1 1.72 45.44L8.45 43.86A42 42 0 0 1 10.95 34.54L5.90 29.81A48.5 48.5 0 0 1 10.47 21.90L17.08 23.91A42 42 0 0 1 23.91 17.08L21.90 10.47A48.5 48.5 0 0 1 29.81 5.90L34.54 10.95A42 42 0 0 1 43.86 8.45Z' fill='%23000'/></svg>");
+  --gear-edge: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M43.86 8.45L45.44 1.72A48.5 48.5 0 0 1 54.56 1.72L56.14 8.45A42 42 0 0 1 65.46 10.95L70.19 5.90A48.5 48.5 0 0 1 78.10 10.47L76.09 17.08A42 42 0 0 1 82.92 23.91L89.53 21.90A48.5 48.5 0 0 1 94.10 29.81L89.05 34.54A42 42 0 0 1 91.55 43.86L98.28 45.44A48.5 48.5 0 0 1 98.28 54.56L91.55 56.14A42 42 0 0 1 89.05 65.46L94.10 70.19A48.5 48.5 0 0 1 89.53 78.10L82.92 76.09A42 42 0 0 1 76.09 82.92L78.10 89.53A48.5 48.5 0 0 1 70.19 94.10L65.46 89.05A42 42 0 0 1 56.14 91.55L54.56 98.28A48.5 48.5 0 0 1 45.44 98.28L43.86 91.55A42 42 0 0 1 34.54 89.05L29.81 94.10A48.5 48.5 0 0 1 21.90 89.53L23.91 82.92A42 42 0 0 1 17.08 76.09L10.47 78.10A48.5 48.5 0 0 1 5.90 70.19L10.95 65.46A42 42 0 0 1 8.45 56.14L1.72 54.56A48.5 48.5 0 0 1 1.72 45.44L8.45 43.86A42 42 0 0 1 10.95 34.54L5.90 29.81A48.5 48.5 0 0 1 10.47 21.90L17.08 23.91A42 42 0 0 1 23.91 17.08L21.90 10.47A48.5 48.5 0 0 1 29.81 5.90L34.54 10.95A42 42 0 0 1 43.86 8.45Z' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'/></svg>");
+}
+
+.menu-node.slider-menu > .disc,
+.menu-node.slider-menu.hovered > .disc,
+.menu-node.slider-menu.hovered.clicked > .disc {
+  background: none;
+  box-shadow: none;
+  /* The cog is a mask, so its edge and float are drop shadows. */
+  filter: drop-shadow(0 3px 0 var(--item-side)) drop-shadow(0 8px 9px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+}
+
+.menu-node.slider-menu > .disc::before,
+.menu-node.slider-menu > .disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--gear-fill);
+  -webkit-mask: var(--gear-shape) center / 100% 100% no-repeat;
+  mask: var(--gear-shape) center / 100% 100% no-repeat;
+  transition: none;
+}
+
+.menu-node.slider-menu > .disc::after {
+  background: var(--gear-line);
+  -webkit-mask-image: var(--gear-edge);
+  mask-image: var(--gear-edge);
+}
+
+/* The cog takes the item face; its edge stroke doubles as the bevel (light on top, dark below). */
+.menu-node.slider-menu > .disc {
+  --gear-fill: var(--item-face), var(--surface-color);
+  --gear-line: linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06) 45%, rgba(0, 0, 0, 0.45));
+}
+
+.menu-node.slider-menu.hovered > .disc {
+  --gear-fill: var(--item-hover-face), var(--surface-hover-color);
+  --gear-line: var(--accent-color);
+}
+
+/* An open scale's knob keeps its face: the ticks and the pointer carry the accent. */
+.menu-node.slider-menu.active > .disc {
+  --gear-fill: var(--item-face), var(--surface-color);
+  --gear-line: linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06) 45%, rgba(0, 0, 0, 0.45));
+}
+
+.menu-node.slider-menu.hovered.clicked > .disc {
+  --gear-fill: var(--lit-face), var(--accent-color);
+  --gear-line: rgba(255, 255, 255, 0.25);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent-glow) 45%, transparent)) drop-shadow(0 8px 9px rgba(0, 0, 0, 0.5));
+}
+
+/* Center text ------------------------------------------------------------------------ */
+
+.center-text {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+  transition: var(--fade);
+}
+
+/* Selection wedges (when turned on in Settings) ------------------------------------------ */
+
+.selection-wedges {
+  mask: radial-gradient(circle at var(--center-x) var(--center-y), #000 96px, transparent 50%);
+  background: var(--wedge-color);
+
+  &.hovered {
+    --width: calc(var(--end-angle) - var(--start-angle));
+    background: conic-gradient(
+      from var(--start-angle) at var(--center-x) var(--center-y),
+      var(--wedge-highlight-color) var(--width),
+      var(--wedge-color) var(--width)
+    );
+  }
+}
+
+.wedge-separators .separator {
+  background: linear-gradient(90deg, transparent 46px, var(--line-color) 46px, transparent 160px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-node,
+  .menu-node .disc,
+  .menu-node .arc {
+    transition: none;
+  }
+}

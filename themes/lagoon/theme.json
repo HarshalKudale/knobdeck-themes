@@ -1,0 +1,54 @@
+{
+  "name": "Lagoon",
+  "author": "KnobDeck",
+  "license": "CC0-1.0",
+  "version": "1.0.0",
+  "description": "Navy items that float over the desktop, a dark glass hub and an aqua light on the item you pick.",
+  "engineVersion": 1,
+  "maxMenuRadius": 170,
+  "centerTextWrapWidth": 80,
+  "sliderStyle": "track",
+  "dynamicCenter": {
+    "childDistance": 112,
+    "itemSpacing": 10.5,
+    "childSize": 52,
+    "gap": 14,
+    "growth": 2.4,
+    "minSize": 92,
+    "maxSize": 260,
+    "textRatio": 0.8
+  },
+  "drawChildrenBelow": true,
+  "drawCenterText": true,
+  "drawSelectionWedges": true,
+  "drawWedgeSeparators": false,
+  "previewBackground": "radial-gradient(circle at 30% 25%, #3a4150, #11141a 70%)",
+  "presets": [
+    "Ice",
+    "Amber",
+    "Rose",
+    "Violet"
+  ],
+  "colors": {
+    "surface-color": "#262c3b",
+    "surface-hover-color": "#3d4a66",
+    "line-color": "rgba(255, 255, 255, 0.10)",
+    "icon-color": "#f5f5f7",
+    "icon-hover-color": "#ffffff",
+    "text-color": "#f2f3f5",
+    "accent-color": "#1f9aa3",
+    "accent-glow": "#63e3e9",
+    "wedge-color": "rgba(0, 0, 0, 0.35)",
+    "wedge-highlight-color": "rgba(31, 154, 163, 0.14)"
+  },
+  "layers": [
+    {
+      "class": "disc",
+      "content": "icon"
+    },
+    {
+      "class": "arc",
+      "content": "none"
+    }
+  ]
+}

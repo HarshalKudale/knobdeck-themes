@@ -182,6 +182,8 @@ async function check(id) {
     ["slider", "slider", null],
     ["slider hover", "slider", 60],
     ["slider 0-10", "slider-coarse", null],
+    // Classes the engine sets briefly or not yet: a committed click, a toggle in its warning state.
+    ["clicked + kd-warn", null, "lit"],
   ];
   const errors = [];
   for (const [label, n, hover] of cases) {
@@ -206,6 +208,14 @@ async function check(id) {
       await sleep(450);
       const r = at(SIZE, 150, 140);
       await p.mouse.move(r.x, r.y, { steps: 6 });
+    } else if (hover === "lit") {
+      const q = at(SIZE, 100, 50);
+      await p.mouse.move(q.x, q.y, { steps: 6 });
+      await sleep(300);
+      await p.evaluate(() => {
+        document.querySelector(".menu-node.child.hovered")?.classList.add("clicked");
+        document.querySelector('.menu-node.child[data-name="Mute Mic"]')?.classList.add("kd-warn");
+      });
     } else if (hover != null) {
       const q = at(SIZE, 100, hover);
       await p.mouse.move(q.x, q.y, { steps: 6 });
