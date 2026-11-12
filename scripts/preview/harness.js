@@ -60,7 +60,10 @@ window.harness = {
   },
   show(menuDef = SAMPLE) {
     const c = { x: innerWidth / 2, y: innerHeight / 2 };
-    menu.show(structuredClone(menuDef), { mousePosition: c, windowSize: { x: innerWidth, y: innerHeight } });
+    const def = structuredClone(menuDef);
+    // The sample's Volume item is a real (closed) slider, so its silhouette shows.
+    if (menuDef === SAMPLE) def.children[def.children.length - 1] = sliderItem({ min: 0, max: 100, step: 2, unit: "%" });
+    menu.show(def, { mousePosition: c, windowSize: { x: innerWidth, y: innerHeight } });
   },
   /**
    * A menu whose slider (`kind`: min, max, step, unit) is open at `value`. Returns the slider's
